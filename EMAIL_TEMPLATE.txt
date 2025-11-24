@@ -1,0 +1,170 @@
+EMAILJS TEMPLATE - Copy this into your EmailJS template editor
+
+===========================================
+SUBJECT LINE:
+===========================================
+
+Thank You for Supporting My Photography Dream, {{to_name}}!
+
+
+===========================================
+EMAIL BODY (HTML):
+===========================================
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            color: #0d4d0d;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .message {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+        .highlight {
+            color: #0d4d0d;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .progress-info {
+            background-color: #f0f8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #0d4d0d;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0d4d0d;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .signature {
+            font-style: italic;
+            color: #0d4d0d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Thank You, {{to_name}}! 🎄</h1>
+        
+        <div class="message">
+            <p>Hello {{to_name}},</p>
+            
+            <p>I wanted to reach out personally to thank you for your incredibly generous donation of <span class="highlight">${{donation_amount}}</span>!</p>
+            
+            <p>Your support means the world to me. Every contribution brings me one step closer to acquiring the professional 70-200mm f/2.8 lens that will help me capture even more stunning sports moments and tell the stories that matter.</p>
+        </div>
+        
+        <div class="progress-info">
+            <h3 style="color: #0d4d0d; margin-top: 0;">Campaign Progress</h3>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value">${{total_raised}}</div>
+                    <div class="stat-label">Raised</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">${{goal_amount}}</div>
+                    <div class="stat-label">Goal</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #666;">
+                We're making amazing progress together! 🎯
+            </p>
+        </div>
+        
+        <div class="message">
+            <p>Your contribution isn't just helping me buy equipment—it's investing in the art of visual storytelling and helping me deliver the best possible quality to my clients and subjects.</p>
+            
+            <p>I can't wait to share the incredible images I'll create with this new lens. Your support makes this dream possible!</p>
+        </div>
+        
+        <div class="signature">
+            <p>With heartfelt gratitude,</p>
+            <p><strong>Kyle S.</strong><br>
+            Sports Photographer | Atlanta, Georgia</p>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for believing in my passion and helping me chase my photographic dreams.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+===========================================
+EMAIL BODY (Plain Text Version - if HTML doesn't work):
+===========================================
+
+Thank You, {{to_name}}! 🎄
+
+Hello {{to_name}},
+
+I wanted to reach out personally to thank you for your incredibly generous donation of ${{donation_amount}}!
+
+Your support means the world to me. Every contribution brings me one step closer to acquiring the professional 70-200mm f/2.8 lens that will help me capture even more stunning sports moments and tell the stories that matter.
+
+CAMPAIGN PROGRESS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Raised: ${{total_raised}}
+Goal:   ${{goal_amount}}
+
+We're making amazing progress together! 🎯
+
+Your contribution isn't just helping me buy equipment—it's investing in the art of visual storytelling and helping me deliver the best possible quality to my clients and subjects.
+
+I can't wait to share the incredible images I'll create with this new lens. Your support makes this dream possible!
+
+With heartfelt gratitude,
+
+Kyle S.
+Sports Photographer | Atlanta, Georgia
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Thank you for believing in my passion and helping me chase my photographic dreams.
+
