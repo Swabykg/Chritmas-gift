@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Kyle S. Capture Stunning Sports Moments</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Hero Section with Trees and Snow -->
+    <section class="hero">
+        <div class="snow-container">
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+            <div class="snowflake"></div>
+        </div>
+        
+        <div class="trees-container">
+            <div class="tree tree-1"></div>
+            <div class="tree tree-2"></div>
+            <div class="tree tree-3"></div>
+            <div class="tree tree-4"></div>
+            <div class="tree tree-5"></div>
+        </div>
+        
+        <div class="hero-content">
+            <h1 class="rising-text">Help Kyle S. Capture Stunning Sports Moments</h1>
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span class="progress-label">Goal: $2,399</span>
+                    <span class="progress-amount" id="currentProgress">$0</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <div class="hero-image-container">
+                <img src="canon-lens.jpg" alt="Canon 70-200mm f/2.8 Professional Telephoto Zoom Lens" class="hero-image">
+            </div>
+            <button class="donate-btn hero-donate" onclick="openDonateModal()">Donate</button>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="content">
+        <div class="content-wrapper">
+            <h2>A Little About Me and My Passion</h2>
+            <p>Hello! Thank you so much for taking the time to read my story.</p>
+            
+            <p>My name is Kyle S., and I'm a passionate sports photographer based in Atlanta, Georgia. For me, photography isn't just a hobby; it's how I connect with the world and tell the stories that matter.</p>
+            
+            <p>I love capturing player action and portraits, especially when something very action-packed happens. I genuinely believe that a photograph can hold a moment forever, and it's a privilege to be the person behind the lens making that happen.</p>
+            
+            <h3>My Next Goal: Elevating My Work</h3>
+            
+            <p>To elevate my photography to the next level and deliver the best possible quality to my current and future clients (or subjects), I aim to acquire a 70-200mm f/2.8 professional telephoto zoom lens.</p>
+            
+            <p>This specific lens is considered a workhorse in the industry because it allows photographers to capture subjects from a distance with incredible clarity and beautiful background blur (bokeh). For the kind of work I specialize in, this lens would be transformative:</p>
+            
+            <ul>
+                <li>It would allow me to capture intimate, candid moments without being intrusive.</li>
+                <li>It would bring distant action right into focus with stunning sharpness.</li>
+            </ul>
+            
+            <h3>How Your Support Will Help</h3>
+            
+            <p>The cost of a professional 70-200mm lens is a significant investment, at around $2,400. This campaign is a humble request to my community, friends, and anyone who values the power of visual storytelling to help me reach this goal.</p>
+            
+            <p>Every single contribution, no matter the size, will bring me one step closer to making this essential upgrade and creating even better photographs.</p>
+            
+            <p>If you can't donate, I understand entirely! Simply sharing this campaign with your network would be an incredible help.</p>
+            
+            <p>Thank you from the bottom of my heart for believing in my passion and helping me chase my photographic dreams. I can't wait to share the images I create with this new lens!</p>
+            
+            <p class="signature">Warmly,<br>Kyle S.</p>
+            
+            <button class="donate-btn content-donate" onclick="openDonateModal()">Donate</button>
+        </div>
+    </section>
+
+    <!-- Donation Modal -->
+    <div id="donateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDonateModal()">&times;</span>
+            <h2>Make a Donation</h2>
+            <form id="donateForm" onsubmit="handleDonation(event)">
+                <div class="form-group">
+                    <label for="amount">Donation Amount ($)</label>
+                    <div class="amount-input-container">
+                        <button type="button" class="amount-btn decrease-btn" onclick="decreaseAmount()">−</button>
+                        <input type="number" id="amount" name="amount" min="1" step="1" value="1" required placeholder="Enter amount" oninput="updateProgressBar()">
+                        <button type="button" class="amount-btn increase-btn" onclick="increaseAmount()">+</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+                <button type="submit" class="donate-btn submit-btn">Continue to Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
