@@ -356,24 +356,27 @@ function updateProgressBar() {
     }
 }
 
-// Create continuous snowfall
-function createSnowflake() {
+// Redesigned snowfall system - ensures no clumping
+let snowflakeQueue = [];
+let currentPosition = 0;
+const SNOWFLAKE_SPACING = 5; // 5% spacing between snowflakes
+
+// Create a single snowflake at a specific position
+function createSnowflakeAtPosition(leftPosition) {
     const snowContainer = document.getElementById('snowContainer');
-    if (!snowContainer) return;
+    if (!snowContainer) return null;
     
     const snowflake = document.createElement('div');
     snowflake.className = 'snowflake';
     snowflake.textContent = '❄';
     
-    // Random horizontal position
-    const leftPosition = Math.random() * 100;
     snowflake.style.left = leftPosition + '%';
     
-    // Random animation duration (8-15 seconds for variety)
-    const duration = 8 + Math.random() * 7;
+    // Random animation duration (10-18 seconds)
+    const duration = 10 + Math.random() * 8;
     snowflake.style.animationDuration = duration + 's';
     
-    // Random size for variety
+    // Random size
     const size = 0.8 + Math.random() * 0.6;
     snowflake.style.fontSize = size + 'em';
     
@@ -381,32 +384,47 @@ function createSnowflake() {
     const opacity = 0.6 + Math.random() * 0.4;
     snowflake.style.opacity = opacity;
     
-    // Start from random position above viewport
-    snowflake.style.transform = `translateY(-${Math.random() * 100}px)`;
+    // Start from top
+    snowflake.style.transform = 'translateY(-10px)';
     
     snowContainer.appendChild(snowflake);
     
-    // Remove snowflake after animation completes
+    // Remove after animation
     setTimeout(() => {
         if (snowflake.parentNode) {
             snowflake.remove();
         }
     }, duration * 1000);
+    
+    return snowflake;
+}
+
+// Sequential snowflake creation - ensures perfect spacing
+function createNextSnowflake() {
+    // Calculate next position
+    currentPosition += SNOWFLAKE_SPACING;
+    
+    // If we've gone past 100%, reset to a small random offset
+    if (currentPosition >= 100) {
+        currentPosition = Math.random() * 3; // Start slightly offset
+    }
+    
+    createSnowflakeAtPosition(currentPosition);
 }
 
 // Start continuous snowfall
 function startSnowfall() {
-    // Create initial snowflakes
-    for (let i = 0; i < 30; i++) {
+    // Create initial snowflakes evenly spaced
+    for (let i = 0; i < 20; i++) {
         setTimeout(() => {
-            createSnowflake();
-        }, i * 200); // Stagger initial creation
+            createNextSnowflake();
+        }, i * 400);
     }
     
-    // Continuously create new snowflakes
+    // Continuously create new snowflakes - one at a time, perfectly spaced
     setInterval(() => {
-        createSnowflake();
-    }, 300); // Create a new snowflake every 300ms
+        createNextSnowflake();
+    }, 600); // Create one every 600ms
 }
 
 // Initialize animations on page load
