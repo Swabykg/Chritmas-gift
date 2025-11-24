@@ -106,52 +106,50 @@ window.onclick = function(event) {
     }
 }
 
-// Send email via EmailJS (with 5 minute delay)
+// Send email via EmailJS (immediately)
 function sendDonationEmail(amount, name, email) {
-    // Store email data in sessionStorage so it persists even if they navigate away
     const emailData = {
         amount: amount,
         name: name,
         email: email,
-        timestamp: Date.now(),
-        sendTime: Date.now() + (5 * 60 * 1000) // 5 minutes from now
+        timestamp: Date.now()
     };
     
-    sessionStorage.setItem('pendingEmail', JSON.stringify(emailData));
-    
-    // Schedule email to send in 5 minutes
-    setTimeout(() => {
-        sendEmailJS(emailData);
-    }, 5 * 60 * 1000); // 5 minutes = 300,000 milliseconds
+    // Send email immediately
+    console.log('📧 Sending email immediately...');
+    sendEmailJS(emailData);
 }
 
-// Actually send the email via EmailJS
+// Actually send the email via EmailJS (returns a promise)
 function sendEmailJS(emailData) {
-    // Check if EmailJS is available
-    if (typeof emailjs === 'undefined') {
-        console.error('EmailJS not loaded');
-        return;
-    }
-    
-    // EmailJS template parameters
-    const templateParams = {
-        to_name: emailData.name,
-        to_email: emailData.email,
-        donation_amount: emailData.amount.toFixed(2),
-        total_raised: (currentDonated + emailData.amount).toLocaleString(),
-        goal_amount: GOAL_AMOUNT.toLocaleString(),
-        message: `Thank you ${emailData.name} for your generous donation of $${emailData.amount.toFixed(2)}!`
-    };
-    
-    // Send email via EmailJS
-    emailjs.send('service_qadjtm9', 'template_9qfqqyq', templateParams)
-        .then(function(response) {
-            console.log('Email sent successfully!', response.status, response.text);
-            // Remove from sessionStorage after successful send
-            sessionStorage.removeItem('pendingEmail');
-        }, function(error) {
-            console.error('Failed to send email:', error);
-        });
+    return new Promise((resolve, reject) => {
+        // Check if EmailJS is available
+        if (typeof emailjs === 'undefined') {
+            console.error('EmailJS not loaded');
+            reject(new Error('EmailJS not loaded'));
+            return;
+        }
+        
+        // EmailJS template parameters
+        const templateParams = {
+            to_name: emailData.name,
+            to_email: emailData.email,
+            donation_amount: emailData.amount.toFixed(2),
+            total_raised: (currentDonated + emailData.amount).toLocaleString(),
+            goal_amount: GOAL_AMOUNT.toLocaleString(),
+            message: `Thank you ${emailData.name} for your generous donation of $${emailData.amount.toFixed(2)}!`
+        };
+        
+        // Send email via EmailJS
+        emailjs.send('service_qadjtm9', 'template_9qfqqyq', templateParams)
+            .then(function(response) {
+                console.log('✅ Email sent successfully!', response.status, response.text);
+                resolve(response);
+            }, function(error) {
+                console.error('❌ Failed to send email:', error);
+                reject(error);
+            });
+    });
 }
 
 // Check for pending emails on page load (in case they come back)
@@ -175,7 +173,7 @@ function checkPendingEmails() {
 }
 
 // Handle Donation Form Submission
-function handleDonation(event) {
+async function handleDonation(event) {
     event.preventDefault();
     event.stopPropagation();
     
@@ -193,29 +191,79 @@ function handleDonation(event) {
     
     console.log('Form data valid:', { amount, name, email });
     
-    // Save donation in background (don't wait)
-    setTimeout(() => {
+    // Save donation to Firebase (with timeout to prevent hanging)
+    const savePromise = new Promise(async (resolve) => {
         try {
-            if (firebaseInitialized) {
-                saveDonationToFirebase(amount, name, email).catch(err => {
-                    console.error('Firebase save failed:', err);
+            if (firebaseInitialized && window.firebaseDatabase) {
+                console.log('Saving to Firebase...');
+                try {
+                    const saved = await saveDonationToFirebase(amount, name, email);
+                    if (saved) {
+                        console.log('✅ Successfully saved to Firebase');
+                        // Update local total
+                        currentDonated += amount;
+                    } else {
+                        console.log('⚠️ Firebase save returned false, using localStorage');
+                        currentDonated += amount;
+                        localStorage.setItem('totalDonated', currentDonated.toString());
+                    }
+                } catch (firebaseError) {
+                    console.error('❌ Firebase save error:', firebaseError);
+                    // Fallback to localStorage
                     currentDonated += amount;
                     localStorage.setItem('totalDonated', currentDonated.toString());
-                });
+                }
             } else {
+                console.log('⚠️ Firebase not initialized, using localStorage');
                 currentDonated += amount;
                 localStorage.setItem('totalDonated', currentDonated.toString());
             }
-            
-            // Schedule email
-            sendDonationEmail(amount, name, email);
         } catch (error) {
-            console.error('Background save error:', error);
+            console.error('❌ Error in save promise:', error);
+            // Fallback to localStorage
+            currentDonated += amount;
+            localStorage.setItem('totalDonated', currentDonated.toString());
         }
-    }, 0);
+        resolve();
+    });
     
-    // IMMEDIATELY redirect - don't wait for anything
-    console.log('Redirecting NOW to Greenlight...');
+    // Wait for Firebase save (max 2 seconds timeout)
+    try {
+        await Promise.race([
+            savePromise,
+            new Promise(resolve => setTimeout(resolve, 2000)) // 2 second timeout
+        ]);
+        console.log('Save completed');
+    } catch (error) {
+        console.error('Save timeout or error:', error);
+    }
+    
+    // Send email immediately (with timeout to prevent hanging)
+    try {
+        console.log('📧 Sending email immediately...');
+        const emailData = {
+            amount: amount,
+            name: name,
+            email: email,
+            timestamp: Date.now()
+        };
+        
+        // Wait for email to send (max 3 seconds timeout)
+        await Promise.race([
+            sendEmailJS(emailData),
+            new Promise(resolve => setTimeout(() => {
+                console.log('⚠️ Email send timeout, continuing...');
+                resolve();
+            }, 3000)) // 3 second timeout
+        ]);
+        console.log('✅ Email sent');
+    } catch (error) {
+        console.error('❌ Error sending email:', error);
+        // Continue even if email fails
+    }
+    
+    // Redirect to Greenlight payment page
+    console.log('Redirecting to Greenlight...');
     window.location.href = 'https://gl.me/u/rMzMm2QtQTML';
     
     return false; // Prevent default form submission
