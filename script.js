@@ -57,20 +57,27 @@ async function saveDonationToFirebase(amount, name, email) {
         const set = window.firebaseSet;
         const push = window.firebasePush;
         
-        // Add individual donation record
+        // Add individual donation record with all details
         const donationsRef = ref(database, 'donations/list');
         const newDonationRef = push(donationsRef);
-        await set(newDonationRef, {
+        const donationRecord = {
             amount: amount,
             name: name,
             email: email,
-            timestamp: Date.now()
-        });
+            timestamp: Date.now(),
+            date: new Date().toISOString()
+        };
+        
+        console.log('💾 Saving donation to Firebase:', donationRecord);
+        await set(newDonationRef, donationRecord);
+        console.log('✅ Donation record saved:', newDonationRef.key);
         
         // Update total (Firebase will handle the increment atomically)
         const totalRef = ref(database, 'donations/total');
         const currentTotal = currentDonated || 0;
-        await set(totalRef, currentTotal + amount);
+        const newTotal = currentTotal + amount;
+        await set(totalRef, newTotal);
+        console.log('✅ Total updated:', currentTotal, '→', newTotal);
         
         return true;
     } catch (error) {
@@ -125,7 +132,7 @@ function sendEmailJS(emailData) {
     return new Promise((resolve, reject) => {
         // Check if EmailJS is available
         if (typeof emailjs === 'undefined') {
-            console.error('EmailJS not loaded');
+            console.error('❌ EmailJS not loaded - make sure EmailJS SDK is included');
             reject(new Error('EmailJS not loaded'));
             return;
         }
@@ -140,13 +147,23 @@ function sendEmailJS(emailData) {
             message: `Thank you ${emailData.name} for your generous donation of $${emailData.amount.toFixed(2)}!`
         };
         
+        console.log('📧 EmailJS sending with params:', templateParams);
+        console.log('📧 Using service: service_qadjtm9, template: template_9qfqqyq');
+        
         // Send email via EmailJS
         emailjs.send('service_qadjtm9', 'template_9qfqqyq', templateParams)
             .then(function(response) {
-                console.log('✅ Email sent successfully!', response.status, response.text);
+                console.log('✅ Email sent successfully!', response);
+                console.log('Response status:', response.status);
+                console.log('Response text:', response.text);
                 resolve(response);
             }, function(error) {
                 console.error('❌ Failed to send email:', error);
+                console.error('Error details:', {
+                    status: error.status,
+                    text: error.text,
+                    message: error.message
+                });
                 reject(error);
             });
     });
@@ -339,8 +356,96 @@ function updateProgressBar() {
     }
 }
 
+// Track active snowflake positions to prevent pairs
+let activeSnowflakePositions = [];
+
+// Create continuous snowfall
+function createSnowflake() {
+    const snowContainer = document.getElementById('snowContainer');
+    if (!snowContainer) return;
+    
+    // Find a position that's far enough from existing snowflakes
+    let leftPosition;
+    let attempts = 0;
+    const minSpacing = 10; // Minimum 10% spacing between snowflakes
+    
+    do {
+        leftPosition = Math.random() * 100;
+        attempts++;
+        
+        // Check if this position is too close to any active snowflake
+        let isTooClose = false;
+        for (let i = 0; i < activeSnowflakePositions.length; i++) {
+            const distance = Math.abs(activeSnowflakePositions[i] - leftPosition);
+            if (distance < minSpacing) {
+                isTooClose = true;
+                break;
+            }
+        }
+        
+        if (!isTooClose || attempts > 100) break;
+    } while (attempts < 100);
+    
+    // Add this position to tracking
+    activeSnowflakePositions.push(leftPosition);
+    
+    const snowflake = document.createElement('div');
+    snowflake.className = 'snowflake';
+    snowflake.textContent = '❄';
+    
+    snowflake.style.left = leftPosition + '%';
+    
+    // Random animation duration (12-20 seconds for slower fall)
+    const duration = 12 + Math.random() * 8;
+    snowflake.style.animationDuration = duration + 's';
+    
+    // Random size for variety
+    const size = 0.8 + Math.random() * 0.6;
+    snowflake.style.fontSize = size + 'em';
+    
+    // Random opacity
+    const opacity = 0.6 + Math.random() * 0.4;
+    snowflake.style.opacity = opacity;
+    
+    // Start from top
+    snowflake.style.transform = 'translateY(-10px)';
+    
+    snowContainer.appendChild(snowflake);
+    
+    // Remove from tracking and DOM after animation completes
+    setTimeout(() => {
+        // Remove this position from tracking array
+        const index = activeSnowflakePositions.indexOf(leftPosition);
+        if (index > -1) {
+            activeSnowflakePositions.splice(index, 1);
+        }
+        // Remove from DOM
+        if (snowflake.parentNode) {
+            snowflake.remove();
+        }
+    }, duration * 1000);
+}
+
+// Start continuous snowfall
+function startSnowfall() {
+    // Create initial snowflakes with proper spacing
+    for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+            createSnowflake();
+        }, i * 800); // Much slower initial creation (800ms apart)
+    }
+    
+    // Continuously create new snowflakes - SLOWLY to prevent pairs
+    setInterval(() => {
+        createSnowflake();
+    }, 1000); // Create ONE snowflake every 1000ms (1 second) - this prevents pairs
+}
+
 // Initialize animations on page load
 window.addEventListener('load', () => {
+    // Start continuous snowfall
+    startSnowfall();
+    
     // Initialize Firebase connection
     initializeFirebase();
     
