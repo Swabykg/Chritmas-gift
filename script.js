@@ -23,12 +23,15 @@ function initializeFirebase() {
             console.log('Total donations updated:', currentDonated);
         }, (error) => {
             console.error('Error reading from Firebase:', error);
+            console.warn('Make sure Realtime Database is enabled in Firebase Console');
+            console.warn('Go to: Firebase Console > Build > Realtime Database > Create Database');
             // Fallback to localStorage if Firebase fails
             currentDonated = loadSavedDonations();
             updateProgressBar();
         });
         
         firebaseInitialized = true;
+        console.log('Firebase Realtime Database connected successfully');
     } else {
         // Retry after a short delay if Firebase isn't ready yet
         setTimeout(initializeFirebase, 100);
@@ -175,21 +178,47 @@ function checkPendingEmails() {
 async function handleDonation(event) {
     event.preventDefault();
     
+    // Ensure redirect happens even if there's an error
+    try {
+    
     const amount = parseFloat(document.getElementById('amount').value) || 0;
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     
-    // Save donation to Firebase (or localStorage as fallback)
-    if (firebaseInitialized) {
-        await saveDonationToFirebase(amount, name, email);
-    } else {
-        // Fallback to localStorage
-        currentDonated += amount;
-        localStorage.setItem('totalDonated', currentDonated.toString());
+    // Validate form data
+    if (!amount || amount <= 0 || !name || !email) {
+        alert('Please fill in all fields correctly.');
+        return; // Don't redirect if form is invalid
+    }
+    
+    console.log('Form submitted. Processing donation...');
+    
+    // Try to save donation to Firebase (don't wait if it fails)
+    try {
+        if (firebaseInitialized) {
+            // Don't await - let it run in background, redirect immediately
+            saveDonationToFirebase(amount, name, email).catch(err => {
+                console.error('Firebase save failed:', err);
+                // Fallback to localStorage
+                currentDonated += amount;
+                localStorage.setItem('totalDonated', currentDonated.toString());
+            });
+        } else {
+            // Fallback to localStorage
+            currentDonated += amount;
+            localStorage.setItem('totalDonated', currentDonated.toString());
+        }
+    } catch (error) {
+        console.error('Error saving donation:', error);
+        // Still continue to redirect
     }
     
     // Schedule email to be sent in 5 minutes
-    sendDonationEmail(amount, name, email);
+    try {
+        sendDonationEmail(amount, name, email);
+    } catch (error) {
+        console.error('Error scheduling email:', error);
+    }
     
     // Store form data (optional - for future use)
     const donationData = {
@@ -201,11 +230,16 @@ async function handleDonation(event) {
     
     // Log donation data
     console.log('Donation Data:', donationData);
+    console.log('Redirecting to Greenlight...');
     
-    // Update progress bar before redirecting
-    updateProgressBar();
+        // Update progress bar before redirecting
+        updateProgressBar();
+    } catch (error) {
+        console.error('Error in donation handler:', error);
+    }
     
-    // Redirect to Greenlight payment page
+    // Always redirect to Greenlight payment page (even if errors occurred)
+    console.log('Redirecting to Greenlight payment page...');
     window.location.href = 'https://gl.me/u/rMzMm2QtQTML';
 }
 
