@@ -356,47 +356,21 @@ function updateProgressBar() {
     }
 }
 
-// Track active snowflake positions to prevent pairs
-let activeSnowflakePositions = [];
-
 // Create continuous snowfall
 function createSnowflake() {
     const snowContainer = document.getElementById('snowContainer');
     if (!snowContainer) return;
     
-    // Find a position that's far enough from existing snowflakes
-    let leftPosition;
-    let attempts = 0;
-    const minSpacing = 10; // Minimum 10% spacing between snowflakes
-    
-    do {
-        leftPosition = Math.random() * 100;
-        attempts++;
-        
-        // Check if this position is too close to any active snowflake
-        let isTooClose = false;
-        for (let i = 0; i < activeSnowflakePositions.length; i++) {
-            const distance = Math.abs(activeSnowflakePositions[i] - leftPosition);
-            if (distance < minSpacing) {
-                isTooClose = true;
-                break;
-            }
-        }
-        
-        if (!isTooClose || attempts > 100) break;
-    } while (attempts < 100);
-    
-    // Add this position to tracking
-    activeSnowflakePositions.push(leftPosition);
-    
     const snowflake = document.createElement('div');
     snowflake.className = 'snowflake';
     snowflake.textContent = '❄';
     
+    // Random horizontal position
+    const leftPosition = Math.random() * 100;
     snowflake.style.left = leftPosition + '%';
     
-    // Random animation duration (12-20 seconds for slower fall)
-    const duration = 12 + Math.random() * 8;
+    // Random animation duration (8-15 seconds for variety)
+    const duration = 8 + Math.random() * 7;
     snowflake.style.animationDuration = duration + 's';
     
     // Random size for variety
@@ -407,19 +381,13 @@ function createSnowflake() {
     const opacity = 0.6 + Math.random() * 0.4;
     snowflake.style.opacity = opacity;
     
-    // Start from top
-    snowflake.style.transform = 'translateY(-10px)';
+    // Start from random position above viewport
+    snowflake.style.transform = `translateY(-${Math.random() * 100}px)`;
     
     snowContainer.appendChild(snowflake);
     
-    // Remove from tracking and DOM after animation completes
+    // Remove snowflake after animation completes
     setTimeout(() => {
-        // Remove this position from tracking array
-        const index = activeSnowflakePositions.indexOf(leftPosition);
-        if (index > -1) {
-            activeSnowflakePositions.splice(index, 1);
-        }
-        // Remove from DOM
         if (snowflake.parentNode) {
             snowflake.remove();
         }
@@ -428,17 +396,17 @@ function createSnowflake() {
 
 // Start continuous snowfall
 function startSnowfall() {
-    // Create initial snowflakes with proper spacing
-    for (let i = 0; i < 15; i++) {
+    // Create initial snowflakes
+    for (let i = 0; i < 30; i++) {
         setTimeout(() => {
             createSnowflake();
-        }, i * 800); // Much slower initial creation (800ms apart)
+        }, i * 200); // Stagger initial creation
     }
     
-    // Continuously create new snowflakes - SLOWLY to prevent pairs
+    // Continuously create new snowflakes
     setInterval(() => {
         createSnowflake();
-    }, 1000); // Create ONE snowflake every 1000ms (1 second) - this prevents pairs
+    }, 300); // Create a new snowflake every 300ms
 }
 
 // Initialize animations on page load

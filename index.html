@@ -9,27 +9,8 @@
 <body>
     <!-- Hero Section with Trees and Snow -->
     <section class="hero">
-        <div class="snow-container">
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
+        <div class="snow-container" id="snowContainer">
+            <!-- Snowflakes will be generated dynamically -->
         </div>
         
         <div class="trees-container">
@@ -130,7 +111,16 @@
     <script type="text/javascript">
         // Initialize EmailJS with your public key
         (function(){
-            emailjs.init("JK9PcN2yDXlTV5FZI");
+            try {
+                if (typeof emailjs !== 'undefined') {
+                    emailjs.init("JK9PcN2yDXlTV5FZI");
+                    console.log('✅ EmailJS initialized successfully');
+                } else {
+                    console.error('❌ EmailJS SDK not loaded');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing EmailJS:', error);
+            }
         })();
     </script>
 
