@@ -232,6 +232,19 @@ body {
     border-radius: 13px;
 }
 
+.progress-remaining {
+    text-align: center;
+    margin-top: 0.8rem;
+    color: #d4e6d4;
+    font-size: 1rem;
+}
+
+.progress-remaining span {
+    color: #116611;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
 .hero-image-container {
     margin: 3rem 0;
     animation: imageFadeIn 2s ease-out 1.5s forwards;

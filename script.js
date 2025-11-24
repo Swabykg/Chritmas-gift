@@ -255,6 +255,7 @@ function decreaseAmount() {
 function updateProgressBar() {
     const progressBar = document.getElementById('progressBar');
     const progressAmount = document.getElementById('currentProgress');
+    const remainingAmount = document.getElementById('remainingAmount');
     
     // Only show the actual current total (no preview)
     const totalAmount = currentDonated;
@@ -262,12 +263,19 @@ function updateProgressBar() {
     // Calculate percentage (cap at 100%)
     const percentage = Math.min((totalAmount / GOAL_AMOUNT) * 100, 100);
     
+    // Calculate remaining amount
+    const remaining = Math.max(0, GOAL_AMOUNT - totalAmount);
+    
     if (progressBar) {
         progressBar.style.width = percentage + '%';
     }
     
     if (progressAmount) {
         progressAmount.textContent = '$' + currentDonated.toLocaleString();
+    }
+    
+    if (remainingAmount) {
+        remainingAmount.textContent = '$' + remaining.toLocaleString();
     }
 }
 
