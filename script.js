@@ -175,11 +175,11 @@ function checkPendingEmails() {
 }
 
 // Handle Donation Form Submission
-async function handleDonation(event) {
+function handleDonation(event) {
     event.preventDefault();
+    event.stopPropagation();
     
-    // Ensure redirect happens even if there's an error
-    try {
+    console.log('=== Form Submitted ===');
     
     const amount = parseFloat(document.getElementById('amount').value) || 0;
     const name = document.getElementById('name').value;
@@ -188,59 +188,37 @@ async function handleDonation(event) {
     // Validate form data
     if (!amount || amount <= 0 || !name || !email) {
         alert('Please fill in all fields correctly.');
-        return; // Don't redirect if form is invalid
+        return false;
     }
     
-    console.log('Form submitted. Processing donation...');
+    console.log('Form data valid:', { amount, name, email });
     
-    // Try to save donation to Firebase (don't wait if it fails)
-    try {
-        if (firebaseInitialized) {
-            // Don't await - let it run in background, redirect immediately
-            saveDonationToFirebase(amount, name, email).catch(err => {
-                console.error('Firebase save failed:', err);
-                // Fallback to localStorage
+    // Save donation in background (don't wait)
+    setTimeout(() => {
+        try {
+            if (firebaseInitialized) {
+                saveDonationToFirebase(amount, name, email).catch(err => {
+                    console.error('Firebase save failed:', err);
+                    currentDonated += amount;
+                    localStorage.setItem('totalDonated', currentDonated.toString());
+                });
+            } else {
                 currentDonated += amount;
                 localStorage.setItem('totalDonated', currentDonated.toString());
-            });
-        } else {
-            // Fallback to localStorage
-            currentDonated += amount;
-            localStorage.setItem('totalDonated', currentDonated.toString());
+            }
+            
+            // Schedule email
+            sendDonationEmail(amount, name, email);
+        } catch (error) {
+            console.error('Background save error:', error);
         }
-    } catch (error) {
-        console.error('Error saving donation:', error);
-        // Still continue to redirect
-    }
+    }, 0);
     
-    // Schedule email to be sent in 5 minutes
-    try {
-        sendDonationEmail(amount, name, email);
-    } catch (error) {
-        console.error('Error scheduling email:', error);
-    }
-    
-    // Store form data (optional - for future use)
-    const donationData = {
-        amount: amount,
-        name: name,
-        email: email,
-        totalDonated: currentDonated + amount
-    };
-    
-    // Log donation data
-    console.log('Donation Data:', donationData);
-    console.log('Redirecting to Greenlight...');
-    
-        // Update progress bar before redirecting
-        updateProgressBar();
-    } catch (error) {
-        console.error('Error in donation handler:', error);
-    }
-    
-    // Always redirect to Greenlight payment page (even if errors occurred)
-    console.log('Redirecting to Greenlight payment page...');
+    // IMMEDIATELY redirect - don't wait for anything
+    console.log('Redirecting NOW to Greenlight...');
     window.location.href = 'https://gl.me/u/rMzMm2QtQTML';
+    
+    return false; // Prevent default form submission
 }
 
 // Smooth scroll behavior
