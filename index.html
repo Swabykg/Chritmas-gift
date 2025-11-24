@@ -144,7 +144,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyCax01t5esQ5CGYyg9bFr5dYuO_-xMRNB0",
             authDomain: "christmas-gift-95c25.firebaseapp.com",
-            databaseURL: "https://christmas-gift-95c25-default-rtdb.firebaseio.com",
+            databaseURL: "https://christmas-gift-95c25-default-rtdb.firebaseio.com/",
             projectId: "christmas-gift-95c25",
             storageBucket: "christmas-gift-95c25.firebasestorage.app",
             messagingSenderId: "806572862268",
@@ -164,6 +164,7 @@
         window.firebasePush = push;
         
         console.log('Firebase initialized successfully');
+        console.log('Database URL:', firebaseConfig.databaseURL);
     </script>
     <script src="script.js"></script>
 </body>
